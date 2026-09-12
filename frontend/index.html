@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contexto Clone</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      margin: 0;
+    }
+    h1 { margin-bottom: 0.5rem; }
+    p { color: #94a3b8; margin-top: 0; }
+    .input-box {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      width: 100%;
+      max-width: 420px;
+    }
+    input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 1rem;
+      outline: none;
+    }
+    button {
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      border: none;
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #7dd3fc; }
+    .guesses {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .guess-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      background: #1e293b;
+      transition: transform 0.15s ease;
+    }
+    .status {
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #38bdf8;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Contexto</h1>
+  <p>Guess the secret word based on semantic similarity.</p>
+
+  <div class="input-box">
+    <input type="text" id="wordInput" placeholder="Type a word..." autofocus />
+    <button onclick="submitGuess()">Guess</button>
+  </div>
+
+  <div class="status" id="statusMsg"></div>
+  <div class="guesses" id="guessList"></div>
+
+  <script>
+    const guesses = [];
+
+    document.getElementById("wordInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitGuess();
+    });
+
+    async function submitGuess() {
+      const input = document.getElementById("wordInput");
+      const statusMsg = document.getElementById("statusMsg");
+      const word = input.value.trim().toLowerCase();
+
+      if (!word) return;
+      statusMsg.innerText = "Checking...";
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/guess", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          statusMsg.innerText = err.detail || "Error processing guess.";
+          return;
+        }
+
+        const data = await res.json();
+        input.value = "";
+        statusMsg.innerText = data.is_correct ? "🎉 You got it! The word was " + data.word.toUpperCase() : "";
+
+        if (!guesses.some((g) => g.word === data.word)) {
+          guesses.push(data);
+          guesses.sort((a, b) => b.similarity - a.similarity);
+          renderGuesses();
+        }
+      } catch (err) {
+        statusMsg.innerText = "Failed to connect to backend server.";
+      }
+    }
+
+    function getColor(score) {
+      if (score >= 80) return "#22c55e";
+      if (score >= 50) return "#eab308";
+      if (score >= 30) return "#f97316";
+      return "#ef4444";
+    }
+
+    function renderGuesses() {
+      const list = document.getElementById("guessList");
+      list.innerHTML = "";
+      guesses.forEach((g) => {
+        const row = document.createElement("div");
+        row.className = "guess-row";
+        row.style.borderLeft = `6px solid ${getColor(g.similarity)}`;
+        row.innerHTML = `<span>${g.word}</span><span>${g.similarity}%</span>`;
+        list.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>
