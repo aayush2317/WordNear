@@ -222,6 +222,15 @@
       <input type="text" id="wordInput" placeholder="Type a word..." autocomplete="off" />
       <button id="guessBtn" onclick="submitGuess()">Guess</button>
     </div>
+    <!-- New Game Reset Button -->
+    <div style="display: flex; justify-content: center; margin-top: -10px;">
+      <button 
+        type="button"
+        onclick="startNewGame()" 
+        style="background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+        ↻ New Word
+      </button>
+    </div>
 
     <!-- Status Messages -->
     <div class="status-msg" id="statusMsg"></div>
@@ -242,6 +251,25 @@
       if (similarity >= 70) return "#488B67"; // Soft Emerald
       if (similarity >= 40) return "#C48A3F"; // Warm Ochre
       return "#B56056";                      // Dusty Terra
+    }
+    async function startNewGame() {
+      const statusMsg = document.getElementById("statusMsg");
+      statusMsg.className = "status-msg";
+      statusMsg.innerText = "Picking a new secret word...";
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/new-game", { method: "POST" });
+        if (res.ok) {
+          guesses.length = 0;
+          renderGuesses();
+          document.getElementById("wordInput").value = "";
+          statusMsg.innerText = "New word ready! Take a guess.";
+        } else {
+          statusMsg.innerText = "Failed to reset game.";
+        }
+      } catch (err) {
+        statusMsg.innerText = "Cannot reach backend server.";
+      }
     }
 
     async function submitGuess() {
