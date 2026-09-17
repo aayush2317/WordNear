@@ -3,89 +3,246 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contexto Clone</title>
+  <title>Wordnear — Semantic Word Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <style>
+    :root {
+      --bg-canvas: #f6f7f2;
+      --card-surface: #ffffff;
+      --text-main: #2b3a32;
+      --text-muted: #74857b;
+      --accent-sage: #5b7f6a;
+      --accent-sage-hover: #486654;
+      --border-subtle: #e2e7e1;
+      --shadow-soft: 0 4px 20px rgba(43, 58, 50, 0.05);
+      --font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem 1rem;
-      margin: 0;
+      padding: 40px 16px;
     }
-    h1 { margin-bottom: 0.5rem; }
-    p { color: #94a3b8; margin-top: 0; }
-    .input-box {
-      display: flex;
-      gap: 0.5rem;
-      margin: 1.5rem 0;
+
+    .container {
       width: 100%;
-      max-width: 420px;
-    }
-    input {
-      flex: 1;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #1e293b;
-      color: #f8fafc;
-      font-size: 1rem;
-      outline: none;
-    }
-    button {
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
-      border: none;
-      background: #38bdf8;
-      color: #0f172a;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    button:hover { background: #7dd3fc; }
-    .guesses {
-      width: 100%;
-      max-width: 420px;
+      max-width: 480px;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 24px;
     }
-    .guess-row {
+
+    /* Brand Header */
+    .brand-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      stroke: var(--accent-sage);
+    }
+
+    .brand-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .brand-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Input Controls */
+    .input-card {
+      background: var(--card-surface);
+      padding: 6px 8px 6px 20px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-card:focus-within {
+      border-color: var(--accent-sage);
+      box-shadow: 0 0 0 3px rgba(91, 127, 106, 0.15);
+    }
+
+    #wordInput {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: transparent;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+
+    #wordInput::placeholder {
+      color: #a4b3a9;
+    }
+
+    #guessBtn {
+      background-color: var(--accent-sage);
+      color: #ffffff;
+      border: none;
+      outline: none;
+      padding: 10px 22px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background-color 0.2s ease;
+    }
+
+    #guessBtn:hover {
+      background-color: var(--accent-sage-hover);
+    }
+
+    /* Status Banner */
+    .status-msg {
+      min-height: 20px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .status-msg.win {
+      color: #2b7a4b;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    /* Guess Results List */
+    .guess-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .guess-card {
+      background: var(--card-surface);
+      border-radius: 14px;
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
-      padding: 0.75rem 1rem;
-      border-radius: 6px;
-      font-weight: 500;
-      background: #1e293b;
-      transition: transform 0.15s ease;
+      align-items: center;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+      animation: slideIn 0.25s ease forwards;
     }
-    .status {
-      margin-bottom: 1rem;
+
+    .guess-card-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-radius: 14px 0 0 14px;
+    }
+
+    .guess-word {
       font-weight: 600;
-      color: #38bdf8;
-      min-height: 24px;
+      font-size: 15px;
+      text-transform: capitalize;
+    }
+
+    .guess-score {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Contexto</h1>
-  <p>Guess the secret word based on semantic similarity.</p>
+  <div class="container">
+    <!-- Minimalist Wordnear Header -->
+    <header class="brand-header">
+      <div class="logo-container">
+        <!-- Modern Line-Art Semantic Compass Icon -->
+        <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m14.5 9.5-5 5"></path>
+          <path d="M12 3v3"></path>
+          <path d="M12 18v3"></path>
+          <path d="M3 12h3"></path>
+          <path d="M18 12h3"></path>
+        </svg>
+        <h1 class="brand-title">Wordnear</h1>
+      </div>
+      <p class="brand-tagline">Semantic word-finding in a calm space</p>
+    </header>
 
-  <div class="input-box">
-    <input type="text" id="wordInput" placeholder="Type a word..." autofocus />
-    <button onclick="submitGuess()">Guess</button>
+    <!-- Pill-shaped Input Bar -->
+    <div class="input-card">
+      <input type="text" id="wordInput" placeholder="Type a word..." autocomplete="off" />
+      <button id="guessBtn" onclick="submitGuess()">Guess</button>
+    </div>
+
+    <!-- Status Messages -->
+    <div class="status-msg" id="statusMsg"></div>
+
+    <!-- Ranked Cards Stream -->
+    <div class="guess-list" id="guessList"></div>
   </div>
-
-  <div class="status" id="statusMsg"></div>
-  <div class="guesses" id="guessList"></div>
 
   <script>
     const guesses = [];
 
+    // Enter key triggers submission properly with the passed event
     document.getElementById("wordInput").addEventListener("keydown", (e) => {
       if (e.key === "Enter") submitGuess();
     });
+
+    function getToneColor(similarity) {
+      if (similarity >= 70) return "#488B67"; // Soft Emerald
+      if (similarity >= 40) return "#C48A3F"; // Warm Ochre
+      return "#B56056";                      // Dusty Terra
+    }
 
     async function submitGuess() {
       const input = document.getElementById("wordInput");
@@ -93,51 +250,62 @@
       const word = input.value.trim().toLowerCase();
 
       if (!word) return;
-      statusMsg.innerText = "Checking...";
+
+      statusMsg.className = "status-msg";
+      statusMsg.innerText = "Finding semantic distance...";
 
       try {
         const res = await fetch("http://127.0.0.1:8000/guess", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word }),
+          body: JSON.stringify({ word: word })
         });
 
         if (!res.ok) {
           const err = await res.json();
-          statusMsg.innerText = err.detail || "Error processing guess.";
+          statusMsg.innerText = err.detail || "Word not recognized.";
           return;
         }
 
         const data = await res.json();
         input.value = "";
-        statusMsg.innerText = data.is_correct ? "🎉 You got it! The word was " + data.word.toUpperCase() : "";
 
-        if (!guesses.some((g) => g.word === data.word)) {
+        if (data.is_correct) {
+          statusMsg.className = "status-msg win";
+          statusMsg.innerText = `✨ Found it! The secret word was "${data.word}".`;
+        } else {
+          statusMsg.innerText = "";
+        }
+
+        // Avoid adding duplicate entries
+        if (!guesses.some(g => g.word === data.word)) {
           guesses.push(data);
           guesses.sort((a, b) => b.similarity - a.similarity);
           renderGuesses();
         }
-      } catch (err) {
-        statusMsg.innerText = "Failed to connect to backend server.";
-      }
-    }
 
-    function getColor(score) {
-      if (score >= 80) return "#22c55e";
-      if (score >= 50) return "#eab308";
-      if (score >= 30) return "#f97316";
-      return "#ef4444";
+      } catch (err) {
+        statusMsg.innerText = "Unable to connect to backend on port 8000.";
+      }
     }
 
     function renderGuesses() {
       const list = document.getElementById("guessList");
       list.innerHTML = "";
+
       guesses.forEach((g) => {
-        const row = document.createElement("div");
-        row.className = "guess-row";
-        row.style.borderLeft = `6px solid ${getColor(g.similarity)}`;
-        row.innerHTML = `<span>${g.word}</span><span>${g.similarity}%</span>`;
-        list.appendChild(row);
+        const card = document.createElement("div");
+        card.className = "guess-card";
+
+        const color = getToneColor(g.similarity);
+
+        card.innerHTML = `
+          <div class="guess-card-bar" style="background-color: ${color}"></div>
+          <span class="guess-word">${g.word}</span>
+          <span class="guess-score" style="color: ${color}">${g.similarity}%</span>
+        `;
+
+        list.appendChild(card);
       });
     }
   </script>
