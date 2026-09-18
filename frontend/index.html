@@ -4,21 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wordnear — Semantic Word Game</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-canvas: #f6f7f2;
-      --card-surface: #ffffff;
-      --text-main: #2b3a32;
-      --text-muted: #74857b;
-      --accent-sage: #5b7f6a;
-      --accent-sage-hover: #486654;
-      --border-subtle: #e2e7e1;
-      --shadow-soft: 0 4px 20px rgba(43, 58, 50, 0.05);
-      --font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --bg: #090a0f;
+      --card-bg: rgba(22, 27, 34, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-hover: rgba(255, 255, 255, 0.16);
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-faint: #484f58;
+      --accent: #2ea043;
+      --accent-glow: rgba(46, 160, 67, 0.35);
+      --hot-color: #f85149;
+      --warm-color: #e3b341;
+      --cold-color: #388bfd;
+      --input-bg: rgba(13, 17, 23, 0.85);
     }
 
     * {
@@ -28,26 +31,29 @@
     }
 
     body {
-      background-color: var(--bg-canvas);
-      color: var(--text-main);
-      font-family: var(--font-family);
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 139, 253, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(46, 160, 67, 0.1) 0px, transparent 50%);
       min-height: 100vh;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-main);
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      align-items: flex-start;
       padding: 40px 16px;
     }
 
     .container {
       width: 100%;
-      max-width: 480px;
+      max-width: 540px;
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
 
-    /* Brand Header */
-    .brand-header {
+    /* Header */
+    .header {
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -55,93 +61,130 @@
       gap: 8px;
     }
 
-    .logo-container {
-      display: flex;
+    .logo-badge {
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #7ee787;
+      margin-bottom: 4px;
     }
 
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      stroke: var(--accent-sage);
+    .logo-badge svg {
+      width: 14px;
+      height: 14px;
     }
 
-    .brand-title {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text-main);
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      background: linear-gradient(180deg, #ffffff 30%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .brand-tagline {
+    .header p {
       font-size: 14px;
       color: var(--text-muted);
       font-weight: 400;
     }
 
-    /* Input Controls */
-    .input-card {
-      background: var(--card-surface);
-      padding: 6px 8px 6px 20px;
-      border-radius: 9999px;
+    /* Input Card */
+    .input-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 8px 8px 8px 18px;
+      backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-subtle);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s ease;
     }
 
-    .input-card:focus-within {
-      border-color: var(--accent-sage);
-      box-shadow: 0 0 0 3px rgba(91, 127, 106, 0.15);
+    .input-box:focus-within {
+      border-color: rgba(126, 231, 135, 0.5);
+      box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.2), 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
-    #wordInput {
+    .input-box input {
       flex: 1;
-      border: none;
-      outline: none;
-      font-size: 16px;
       background: transparent;
-      color: var(--text-main);
-      font-family: inherit;
-    }
-
-    #wordInput::placeholder {
-      color: #a4b3a9;
-    }
-
-    #guessBtn {
-      background-color: var(--accent-sage);
-      color: #ffffff;
       border: none;
       outline: none;
-      padding: 10px 22px;
-      border-radius: 9999px;
+      color: var(--text-main);
+      font-size: 16px;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    .input-box input::placeholder {
+      color: var(--text-faint);
+    }
+
+    .btn-submit {
+      background: #238636;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
-      transition: background-color 0.2s ease;
+      transition: all 0.2s ease;
     }
 
-    #guessBtn:hover {
-      background-color: var(--accent-sage-hover);
+    .btn-submit:hover {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
 
-    /* Status Banner */
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* Controls & Status */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      font-size: 13px;
+    }
+
     .status-msg {
-      min-height: 20px;
-      text-align: center;
+      color: var(--text-muted);
       font-size: 13px;
       font-weight: 500;
-      color: var(--text-muted);
     }
 
-    .status-msg.win {
-      color: #2b7a4b;
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
       font-weight: 600;
-      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border-color: var(--card-border-hover);
     }
 
     /* Guess Results List */
@@ -149,127 +192,197 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      width: 100%;
     }
 
     .guess-card {
-      background: var(--card-surface);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 14px;
-      padding: 12px 18px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease;
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .guess-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-subtle);
-      position: relative;
-      overflow: hidden;
-      animation: slideIn 0.25s ease forwards;
-    }
-
-    .guess-card-bar {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 5px;
-      border-radius: 14px 0 0 14px;
     }
 
     .guess-word {
-      font-weight: 600;
       font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
       text-transform: capitalize;
     }
 
-    .guess-score {
-      font-weight: 700;
-      font-size: 14px;
+    .guess-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .score-badge {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .temp-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* Progress bar */
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Semantic Temperature Colors */
+    .hot {
+      color: var(--hot-color);
+    }
+    .hot-bg {
+      background: var(--hot-color);
+    }
+    .hot-pill {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--hot-color);
+    }
+
+    .warm {
+      color: var(--warm-color);
+    }
+    .warm-bg {
+      background: var(--warm-color);
+    }
+    .warm-pill {
+      background: rgba(227, 179, 65, 0.15);
+      color: var(--warm-color);
+    }
+
+    .cold {
+      color: var(--cold-color);
+    }
+    .cold-bg {
+      background: var(--cold-color);
+    }
+    .cold-pill {
+      background: rgba(56, 139, 253, 0.15);
+      color: var(--cold-color);
+    }
+
+    /* Win Banner */
+    .win-banner {
+      background: linear-gradient(135deg, rgba(46, 160, 67, 0.25), rgba(56, 139, 253, 0.15));
+      border: 1px solid rgba(126, 231, 135, 0.4);
+      padding: 16px;
+      border-radius: 14px;
+      text-align: center;
+      font-weight: 600;
+      color: #7ee787;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <!-- Minimalist Wordnear Header -->
-    <header class="brand-header">
-      <div class="logo-container">
-        <!-- Modern Line-Art Semantic Compass Icon -->
-        <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="9"></circle>
-          <path d="m14.5 9.5-5 5"></path>
-          <path d="M12 3v3"></path>
-          <path d="M12 18v3"></path>
-          <path d="M3 12h3"></path>
-          <path d="M18 12h3"></path>
+    <div class="header">
+      <div class="logo-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
         </svg>
-        <h1 class="brand-title">Wordnear</h1>
+        Wordnear
       </div>
-      <p class="brand-tagline">Semantic word-finding in a calm space</p>
-    </header>
-
-    <!-- Pill-shaped Input Bar -->
-    <div class="input-card">
-      <input type="text" id="wordInput" placeholder="Type a word..." autocomplete="off" />
-      <button id="guessBtn" onclick="submitGuess()">Guess</button>
-    </div>
-    <!-- New Game Reset Button -->
-    <div style="display: flex; justify-content: center; margin-top: -10px;">
-      <button 
-        type="button"
-        onclick="startNewGame()" 
-        style="background: transparent; border: 1px solid var(--border-subtle); color: var(--text-muted); padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
-        ↻ New Word
-      </button>
+      <h1>Find the Secret Word</h1>
+      <p>Enter any word to test its conceptual distance in embedding space</p>
     </div>
 
-    <!-- Status Messages -->
-    <div class="status-msg" id="statusMsg"></div>
+    <form id="guessForm" onsubmit="event.preventDefault(); submitGuess();">
+      <div class="input-box">
+        <input 
+          type="text" 
+          id="wordInput" 
+          placeholder="Type your guess..." 
+          autocomplete="off" 
+          autofocus
+        />
+        <button type="submit" class="btn-submit">Guess</button>
+      </div>
+    </form>
 
-    <!-- Ranked Cards Stream -->
-    <div class="guess-list" id="guessList"></div>
+    <div class="controls">
+      <div id="statusMsg" class="status-msg">Waiting for your first guess...</div>
+      <button type="button" class="btn-ghost" onclick="startNewGame()">↻ New Word</button>
+    </div>
+
+    <div id="winContainer"></div>
+    <div id="guessList" class="guess-list"></div>
   </div>
 
   <script>
     const guesses = [];
 
-    // Enter key triggers submission properly with the passed event
-    document.getElementById("wordInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") submitGuess();
-    });
-
-    function getToneColor(similarity) {
-      if (similarity >= 70) return "#488B67"; // Soft Emerald
-      if (similarity >= 40) return "#C48A3F"; // Warm Ochre
-      return "#B56056";                      // Dusty Terra
+    function getTempClass(score) {
+      if (score >= 65) return { name: 'hot', label: 'Very Hot' };
+      if (score >= 35) return { name: 'warm', label: 'Warm' };
+      return { name: 'cold', label: 'Cold' };
     }
-    async function startNewGame() {
-      const statusMsg = document.getElementById("statusMsg");
-      statusMsg.className = "status-msg";
-      statusMsg.innerText = "Picking a new secret word...";
 
-      try {
-        const res = await fetch("http://127.0.0.1:8000/new-game", { method: "POST" });
-        if (res.ok) {
-          guesses.length = 0;
-          renderGuesses();
-          document.getElementById("wordInput").value = "";
-          statusMsg.innerText = "New word ready! Take a guess.";
-        } else {
-          statusMsg.innerText = "Failed to reset game.";
-        }
-      } catch (err) {
-        statusMsg.innerText = "Cannot reach backend server.";
-      }
+    function renderGuesses() {
+      const list = document.getElementById("guessList");
+      list.innerHTML = "";
+
+      // Sort descending by highest similarity
+      const sorted = [...guesses].sort((a, b) => b.similarity - a.similarity);
+
+      sorted.forEach((item) => {
+        const temp = getTempClass(item.similarity);
+        const card = document.createElement("div");
+        card.className = "guess-card";
+        card.innerHTML = `
+          <div class="guess-row">
+            <span class="guess-word">${item.word}</span>
+            <div class="guess-meta">
+              <span class="temp-pill ${temp.name}-pill">${temp.label}</span>
+              <span class="score-badge ${temp.name}">${item.similarity}%</span>
+            </div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill ${temp.name}-bg" style="width: ${item.similarity}%;"></div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
     }
 
     async function submitGuess() {
@@ -279,11 +392,10 @@
 
       if (!word) return;
 
-      statusMsg.className = "status-msg";
-      statusMsg.innerText = "Finding semantic distance...";
+      statusMsg.innerText = "Measuring semantic proximity...";
 
       try {
-        const res = await fetch("http://127.0.0.1:8000/guess", {
+        const res = await fetch(`http://${window.location.hostname}:8000/guess`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word: word })
@@ -291,50 +403,57 @@
 
         if (!res.ok) {
           const err = await res.json();
-          statusMsg.innerText = err.detail || "Word not recognized.";
+          statusMsg.innerText = err.detail || "Error evaluating guess.";
           return;
         }
 
         const data = await res.json();
-        input.value = "";
 
-        if (data.is_correct) {
-          statusMsg.className = "status-msg win";
-          statusMsg.innerText = `✨ Found it! The secret word was "${data.word}".`;
-        } else {
-          statusMsg.innerText = "";
-        }
-
-        // Avoid adding duplicate entries
+        // Avoid duplicate records
         if (!guesses.some(g => g.word === data.word)) {
           guesses.push(data);
-          guesses.sort((a, b) => b.similarity - a.similarity);
-          renderGuesses();
         }
 
+        renderGuesses();
+        input.value = "";
+        input.focus();
+
+        if (data.is_correct) {
+          statusMsg.innerText = "Target found!";
+          document.getElementById("winContainer").innerHTML = `
+            <div class="win-banner">
+              🎉 Extraordinary! You found the secret word: <strong>${data.word}</strong>!
+            </div>
+          `;
+        } else {
+          statusMsg.innerText = `Evaluated "${data.word}" (${data.similarity}%)`;
+        }
       } catch (err) {
-        statusMsg.innerText = "Unable to connect to backend on port 8000.";
+        statusMsg.innerText = "Cannot reach backend. Verify port 8000 is open.";
       }
     }
 
-    function renderGuesses() {
-      const list = document.getElementById("guessList");
-      list.innerHTML = "";
+    async function startNewGame() {
+      const statusMsg = document.getElementById("statusMsg");
+      statusMsg.innerText = "Selecting a new secret word...";
 
-      guesses.forEach((g) => {
-        const card = document.createElement("div");
-        card.className = "guess-card";
+      try {
+        const res = await fetch(`http://${window.location.hostname}:8000/new-game`, {
+          method: "POST"
+        });
 
-        const color = getToneColor(g.similarity);
-
-        card.innerHTML = `
-          <div class="guess-card-bar" style="background-color: ${color}"></div>
-          <span class="guess-word">${g.word}</span>
-          <span class="guess-score" style="color: ${color}">${g.similarity}%</span>
-        `;
-
-        list.appendChild(card);
-      });
+        if (res.ok) {
+          guesses.length = 0;
+          document.getElementById("winContainer").innerHTML = "";
+          renderGuesses();
+          document.getElementById("wordInput").value = "";
+          statusMsg.innerText = "New target word generated. Begin guessing!";
+        } else {
+          statusMsg.innerText = "Failed to generate new game.";
+        }
+      } catch (err) {
+        statusMsg.innerText = "Cannot connect to server.";
+      }
     }
   </script>
 </body>
